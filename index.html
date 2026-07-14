@@ -10,21 +10,50 @@
             color: #eee;
             font-family: Arial, sans-serif;
             padding: 20px;
+            margin: 0;
+            font-size: 18px;
+            line-height: 1.5;
         }
 
         h1 {
             margin-bottom: 20px;
+            font-size: 28px;
+            text-align: center;
         }
 
         .audio-item {
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #444;
+            margin-bottom: 18px;
+            padding: 16px;
+            background: #1c1c1c;
+            border-radius: 10px;
+            font-size: 20px;
         }
 
         audio {
             width: 100%;
-            margin-top: 10px;
+            margin-top: 12px;
+        }
+
+        /* Mobile scaling */
+        @media (max-width: 600px) {
+            body {
+                font-size: 20px;
+                padding: 16px;
+            }
+
+            h1 {
+                font-size: 32px;
+            }
+
+            .audio-item {
+                padding: 22px;
+                font-size: 22px;
+                border-radius: 14px;
+            }
+
+            audio {
+                margin-top: 16px;
+            }
         }
     </style>
 </head>
@@ -33,7 +62,6 @@
 
 <h1>Audio Files</h1>
 
-<!-- REQUIRED: this is where your JS inserts audio players -->
 <div id="audio-list"></div>
 
 <script>
@@ -58,7 +86,6 @@ async function loadAudio() {
 
                 const audio = document.createElement("audio");
                 audio.controls = true;
-
                 audio.src = file.download_url;
 
                 container.appendChild(title);
