@@ -5,76 +5,88 @@
 <title>Peter Sivalia Audio</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#111111">
-
 <style>
     body {
         background: #111;
         color: #eee;
         font-family: Arial, sans-serif;
         padding: 20px;
-        margin-bottom: 120px; /* space for bottom player */
+        margin-bottom: 120px;
     }
-
-    h1 {
-        margin-bottom: 20px;
-    }
-
     .audio-item {
         background: #1a1a1a;
         padding: 16px;
         margin-bottom: 20px;
         border-radius: 12px;
         border: 1px solid #333;
-        position: relative;
     }
-
-    .play-btn {
-        padding: 10px 16px;
-        background: #4CAF50;
-        border: none;
-        border-radius: 6px;
-        color: white;
-        cursor: pointer;
-        font-size: 16px;
-        margin-top: 10px;
-    }
-
-    .play-btn:hover {
-        background: #45a049;
-    }
-
-    .share-btn {
-        background: none;
-        border: none;
-        cursor: pointer;
-        font-size: 22px;
-        margin-left: 10px;
-        color: #ddd;
-    }
-
-    .share-btn:hover {
-        color: #fff;
-    }
-
-    .share-popup {
-        position: absolute;
+    #bottom-player {
+        position: fixed;
+        bottom: 0;
         left: 0;
         right: 0;
-        top: 100%;
-        margin-top: 10px;
-        background: #1e1e1e;
-        padding: 14px;
-        border-radius: 12px;
-        border: 1px solid #333;
-        display: none;
-        flex-direction: column;
-        gap: 10px;
-        width: 100%;
-        z-index: 999;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        background: #000;
+        padding: 16px;
+        border-top: 1px solid #333;
     }
-
-    .share-popup input {
+    #bottom-player audio {
         width: 100%;
+    }
+</style>
+</head>
+
+<body>
+<h1>Peter Sivalia Audio</h1>
+
+<div id="audio-list"></div>
+
+<div id="bottom-player">
+    <div id="now-playing">Nothing playing</div>
+    <audio id="player" controls></audio>
+</div>
+
+<script>
+// YOUR GITHUB INFO
+const username = "petersivalia";
+const repo = "petersivalia.github.io";
+const folder = "audio_01";
+
+// GitHub API URL to list folder contents
+const apiURL = `https://api.github.com/repos/${username}/${repo}/contents/${folder}`;
+
+fetch(apiURL)
+    .then(res => res.json())
+    .then(files => {
+        const list = document.getElementById("audio-list");
+
+        files
+            .filter(f => f.name.endsWith(".wav") || f.name.endsWith(".mp3"))
+            .forEach(file => {
+                const title = file.name.replace(/\.[^/.]+$/, "");
+
+                const item = document.createElement("div");
+                item.className = "audio-item";
+
+                item.innerHTML = `
+                    <h2>${title}</h2>
+                    <button class="play-btn">Play</button>
+                `;
+
+                const playBtn = item.querySelector(".play-btn");
+
+                playBtn.addEventListener("click", () => {
+                    const player = document.getElementById("player");
+                    const nowPlaying = document.getElementById("now-playing");
+
+                    player.src = `${folder}/${file.name}`;
+                    player.play();
+                    nowPlaying.textContent = "Now Playing: " + title;
+                });
+
+                list.appendChild(item);
+            });
+    });
+</script>
+
+</body>
+</html>
