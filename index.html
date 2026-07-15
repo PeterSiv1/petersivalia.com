@@ -5,10 +5,9 @@
 <title>Peter Sivalia Audio</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- PWA manifest -->
+<!-- PWA manifest (still fine without SW) -->
 <link rel="manifest" href="manifest.webmanifest">
 
-<!-- Theme color for the app shell -->
 <meta name="theme-color" content="#111111">
 
 <style>
@@ -51,7 +50,6 @@
         right: 0;
         top: 100%;
         margin-top: 10px;
-
         background: #1e1e1e;
         padding: 14px;
         border-radius: 12px;
@@ -113,13 +111,26 @@
 <div id="audio-list">Loading audio…</div>
 
 <script>
-// Register service worker for PWA
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js')
-            .catch(err => console.error('SW registration failed:', err));
-    });
+// ⭐ AUTO‑RELOAD WHEN NEW CODE IS DEPLOYED
+// This fetches index.html with "no-cache" and compares it to the current version.
+async function checkForUpdate() {
+    try {
+        const response = await fetch(window.location.href, { cache: "no-cache" });
+        const text = await response.text();
+
+        // If the new HTML differs from the current one, reload the page.
+        if (!document.documentElement.outerHTML.includes(text.trim().slice(0, 200))) {
+            console.log("New version detected — reloading.");
+            location.reload(true);
+        }
+    } catch (err) {
+        console.error("Update check failed:", err);
+    }
 }
+
+// Check every 10 seconds
+setInterval(checkForUpdate, 10000);
+
 
 // ⭐ GLOBAL currently playing audio
 let currentAudio = null;
@@ -128,7 +139,7 @@ async function loadAudio() {
     const apiUrl = "https://api.github.com/repos/PeterSiv1/petersivalia.com/contents/audio_01";
 
     try {
-        const response = await fetch(apiUrl);
+        const response = await fetch(apiUrl, { cache: "no-cache" });
         const files = await response.json();
 
         const audioList = document.getElementById("audio-list");
@@ -151,7 +162,7 @@ async function loadAudio() {
                 audio.addEventListener("play", () => {
                     if (currentAudio && currentAudio !== audio) {
                         currentAudio.pause();
-                        currentAudio.currentTime = 0; // fully stop
+                        currentAudio.currentTime = 0;
                     }
                     currentAudio = audio;
                 });
@@ -194,3 +205,32 @@ async function loadAudio() {
 
                 shareOptions.appendChild(msgBtn);
                 shareOptions.appendChild(waBtn);
+                shareOptions.appendChild(emailBtn);
+
+                popup.appendChild(urlField);
+                popup.appendChild(copyBtn);
+                popup.appendChild(shareOptions);
+
+                shareBtn.onclick = () => {
+                    popup.style.display = popup.style.display === "flex" ? "none" : "flex";
+                };
+
+                container.appendChild(title);
+                container.appendChild(audio);
+                container.appendChild(shareBtn);
+                container.appendChild(popup);
+
+                audioList.appendChild(container);
+            }
+        });
+    } catch (err) {
+        console.error("Error loading audio:", err);
+        document.getElementById("audio-list").innerHTML = "Failed to load audio files.";
+    }
+}
+
+loadAudio();
+</script>
+
+</body>
+</html>
