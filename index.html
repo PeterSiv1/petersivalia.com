@@ -5,10 +5,11 @@
 <title>Peter Sivalia Audio</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- ⭐ PERMANENT CACHE-BUSTER (REAL FIX) -->
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-<meta http-equiv="Pragma" content="no-cache" />
-<meta http-equiv="Expires" content="0" />
+<!-- PWA manifest -->
+<link rel="manifest" href="manifest.webmanifest">
+
+<!-- Theme color for the app shell -->
+<meta name="theme-color" content="#111111">
 
 <style>
     body {
@@ -44,7 +45,6 @@
         color: #fff;
     }
 
-    /* ⭐ MOBILE-FRIENDLY POPUP */
     .share-popup {
         position: absolute;
         left: 0;
@@ -113,7 +113,14 @@
 <div id="audio-list">Loading audio…</div>
 
 <script>
-// v3 — version bump to force fresh load
+// Register service worker for PWA
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+            .catch(err => console.error('SW registration failed:', err));
+    });
+}
+
 async function loadAudio() {
     const apiUrl = "https://api.github.com/repos/PeterSiv1/petersivalia.com/contents/audio_01";
 
@@ -137,12 +144,10 @@ async function loadAudio() {
                 audio.controls = true;
                 audio.src = file.download_url;
 
-                // SHARE ICON
                 const shareBtn = document.createElement("button");
                 shareBtn.className = "share-btn";
                 shareBtn.innerHTML = "🔗";
 
-                // POPUP
                 const popup = document.createElement("div");
                 popup.className = "share-popup";
 
@@ -160,7 +165,6 @@ async function loadAudio() {
                     setTimeout(() => copyBtn.textContent = "Copy", 1500);
                 };
 
-                // OPTIONAL SHARE BUTTONS
                 const shareOptions = document.createElement("div");
                 shareOptions.className = "share-options";
 

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Peter Sivalia Audio</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ⭐ PERMANENT CACHE-BUSTER (REAL FIX) -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+
+<style>
+    body {
+        background: #111;
+        color: #eee;
+        font-family: Arial, sans-serif;
+        padding: 20px;
+    }
+
+    h1 {
+        margin-bottom: 20px;
+    }
+
+    .audio-item {
+        background: #1a1a1a;
+        padding: 16px;
+        margin-bottom: 20px;
+        border-radius: 12px;
+        border: 1px solid #333;
+        position: relative;
+    }
+
+    .share-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 22px;
+        margin-left: 10px;
+        color: #ddd;
+    }
+
+    .share-btn:hover {
+        color: #fff;
+    }
+
+    /* ⭐ MOBILE-FRIENDLY POPUP */
+    .share-popup {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 100%;
+        margin-top: 10px;
+
+        background: #1e1e1e;
+        padding: 14px;
+        border-radius: 12px;
+        border: 1px solid #333;
+        display: none;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+        z-index: 999;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+
+    .share-popup input {
+        width: 100%;
+        padding: 8px;
+        border-radius: 6px;
+        border: none;
+        background: #2c2c2c;
+        color: #eee;
+    }
+
+    .share-popup button {
+        padding: 8px;
+        border: none;
+        border-radius: 6px;
+        background: #444;
+        color: #eee;
+        cursor: pointer;
+    }
+
+    .share-popup button:hover {
+        background: #555;
+    }
+
+    .share-options {
+        display: flex;
+        gap: 10px;
+    }
+
+    .share-options button {
+        flex: 1;
+        padding: 8px;
+        background: #333;
+        border-radius: 6px;
+        border: none;
+        color: #eee;
+        cursor: pointer;
+    }
+
+    .share-options button:hover {
+        background: #444;
+    }
+</style>
+</head>
+
+<body>
+
+<h1>Peter Sivalia Audio</h1>
+<div id="audio-list">Loading audio…</div>
+
+<script>
+// v3 — version bump to force fresh load
+async function loadAudio() {
+    const apiUrl = "https://api.github.com/repos/PeterSiv1/petersivalia.com/contents/audio_01";
+
+    try {
+        const response = await fetch(apiUrl);
+        const files = await response.json();
+
+        const audioList = document.getElementById("audio-list");
+        audioList.innerHTML = "";
+
+        files.forEach(file => {
+            if (file.type === "file" && (file.name.endsWith(".mp3") || file.name.endsWith(".wav"))) {
+
+                const container = document.createElement("div");
+                container.className = "audio-item";
+
+                const title = document.createElement("div");
+                title.textContent = file.name;
+
+                const audio = document.createElement("audio");
+                audio.controls = true;
+                audio.src = file.download_url;
+
+                // SHARE ICON
+                const shareBtn = document.createElement("button");
+                shareBtn.className = "share-btn";
+                shareBtn.innerHTML = "🔗";
+
+                // POPUP
+                const popup = document.createElement("div");
+                popup.className = "share-popup";
+
+                const publicUrl = `https://petersivalia.com/audio_01/${file.name}`;
+
+                const urlField = document.createElement("input");
+                urlField.value = publicUrl;
+
+                const copyBtn = document.createElement("button");
+                copyBtn.textContent = "Copy";
+
+                copyBtn.onclick = () => {
+                    navigator.clipboard.writeText(publicUrl);
+                    copyBtn.textContent = "Copied!";
+                    setTimeout(() => copyBtn.textContent = "Copy", 1500);
+                };
+
+                // OPTIONAL SHARE BUTTONS
+                const shareOptions = document.createElement("div");
+                shareOptions.className = "share-options";
+
+                const msgBtn = document.createElement("button");
+                msgBtn.textContent = "Messages";
+                msgBtn.onclick = () => window.open(`sms:&body=${encodeURIComponent(publicUrl)}`);
+
+                const waBtn = document.createElement("button");
+                waBtn.textContent = "WhatsApp";
+                waBtn.onclick = () => window.open(`https://wa.me/?text=${encodeURIComponent(publicUrl)}`);
+
+                const emailBtn = document.createElement("button");
+                emailBtn.textContent = "Email";
+                emailBtn.onclick = () => window.open(`mailto:?subject=Track&body=${encodeURIComponent(publicUrl)}`);
+
+                shareOptions.appendChild(msgBtn);
+                shareOptions.appendChild(waBtn);
+                shareOptions.appendChild(emailBtn);
+
+                popup.appendChild(urlField);
+                popup.appendChild(copyBtn);
+                popup.appendChild(shareOptions);
+
+                shareBtn.onclick = () => {
+                    popup.style.display = popup.style.display === "flex" ? "none" : "flex";
+                };
+
+                container.appendChild(title);
+                container.appendChild(audio);
+                container.appendChild(shareBtn);
+                container.appendChild(popup);
+
+                audioList.appendChild(container);
+            }
+        });
+    } catch (err) {
+        console.error("Error loading audio:", err);
+        document.getElementById("audio-list").innerHTML = "Failed to load audio files.";
+    }
+}
+
+loadAudio();
+</script>
+
+</body>
+</html>
