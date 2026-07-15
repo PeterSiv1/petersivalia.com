@@ -121,6 +121,9 @@ if ('serviceWorker' in navigator) {
     });
 }
 
+// ⭐ GLOBAL currently playing audio
+let currentAudio = null;
+
 async function loadAudio() {
     const apiUrl = "https://api.github.com/repos/PeterSiv1/petersivalia.com/contents/audio_01";
 
@@ -143,6 +146,15 @@ async function loadAudio() {
                 const audio = document.createElement("audio");
                 audio.controls = true;
                 audio.src = file.download_url;
+
+                // ⭐ STOP PREVIOUS TRACK WHEN THIS ONE PLAYS
+                audio.addEventListener("play", () => {
+                    if (currentAudio && currentAudio !== audio) {
+                        currentAudio.pause();
+                        currentAudio.currentTime = 0; // fully stop
+                    }
+                    currentAudio = audio;
+                });
 
                 const shareBtn = document.createElement("button");
                 shareBtn.className = "share-btn";
@@ -182,32 +194,3 @@ async function loadAudio() {
 
                 shareOptions.appendChild(msgBtn);
                 shareOptions.appendChild(waBtn);
-                shareOptions.appendChild(emailBtn);
-
-                popup.appendChild(urlField);
-                popup.appendChild(copyBtn);
-                popup.appendChild(shareOptions);
-
-                shareBtn.onclick = () => {
-                    popup.style.display = popup.style.display === "flex" ? "none" : "flex";
-                };
-
-                container.appendChild(title);
-                container.appendChild(audio);
-                container.appendChild(shareBtn);
-                container.appendChild(popup);
-
-                audioList.appendChild(container);
-            }
-        });
-    } catch (err) {
-        console.error("Error loading audio:", err);
-        document.getElementById("audio-list").innerHTML = "Failed to load audio files.";
-    }
-}
-
-loadAudio();
-</script>
-
-</body>
-</html>
