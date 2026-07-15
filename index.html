@@ -5,9 +5,7 @@
 <title>Peter Sivalia Audio</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- PWA manifest (still fine without SW) -->
 <link rel="manifest" href="manifest.webmanifest">
-
 <meta name="theme-color" content="#111111">
 
 <style>
@@ -111,27 +109,6 @@
 <div id="audio-list">Loading audio…</div>
 
 <script>
-// ⭐ AUTO‑RELOAD WHEN NEW CODE IS DEPLOYED
-// This fetches index.html with "no-cache" and compares it to the current version.
-async function checkForUpdate() {
-    try {
-        const response = await fetch(window.location.href, { cache: "no-cache" });
-        const text = await response.text();
-
-        // If the new HTML differs from the current one, reload the page.
-        if (!document.documentElement.outerHTML.includes(text.trim().slice(0, 200))) {
-            console.log("New version detected — reloading.");
-            location.reload(true);
-        }
-    } catch (err) {
-        console.error("Update check failed:", err);
-    }
-}
-
-// Check every 10 seconds
-setInterval(checkForUpdate, 10000);
-
-
 // ⭐ GLOBAL currently playing audio
 let currentAudio = null;
 
